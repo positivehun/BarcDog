@@ -7,120 +7,83 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: Arial, sans-serif;
+            margin: 0;
             padding: 20px;
             background-color: #FBEFD4;
             color: #333333;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .logo-container {
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        .logo-container:hover {
-            transform: scale(1.05);
-        }
-        .logo-image {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 10px;
-        }
-        .logo-text {
-            font-family: 'Gothic', 'Old English Text MT', 'UnifrakturMaguntia', serif;
-            font-size: 36px;
-            font-weight: bold;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
             background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            width: 90%;
-            max-width: 600px;
-            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .code-container {
-            background-color: #f5f5f5;
-            padding: 25px;
-            margin: 15px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .code-item {
+            background-color: #f8f9fa;
+            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-        .code-number {
-            font-size: 18px;
-            color: #333333;
-            margin-bottom: 15px;
-            font-weight: 500;
+        .code-item h3 {
+            color: #28a745;
+            margin-bottom: 10px;
         }
-        .code-image {
+        .code-item img {
             max-width: 100%;
             height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-        .code-type {
-            font-size: 14px;
-            color: #4CAF50;
-            margin-bottom: 8px;
-            font-weight: 500;
+            margin: 10px 0;
         }
         .back-button {
             display: inline-block;
-            padding: 12px 24px;
-            background-color: #4CAF50;
+            padding: 10px 20px;
+            background-color: #28a745;
             color: white;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 5px;
             margin-top: 20px;
             transition: background-color 0.3s;
         }
         .back-button:hover {
-            background-color: #45a049;
+            background-color: #218838;
         }
-        h1 {
+        .title {
             text-align: center;
-            color: #333333;
             margin-bottom: 30px;
-            font-size: 28px;
-            font-weight: 600;
         }
-        .codes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+        .logo-text {
+            font-family: 'Gothic', 'Old English Text MT', 'UnifrakturMaguntia', serif;
+            font-size: 2em;
+            color: #28a745;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <a href="/" class="logo-container">
-        <img src="{{ url_for('static', filename='barcdog_logo.png') }}" alt="BarcDog Logo" class="logo-image">
-        <h2 class="logo-text">BarcDog</h2>
-    </a>
     <div class="container">
-        <h1>생성된 코드</h1>
-        <div class="codes-grid">
+        <div class="title">
+            <a href="{{ url_for('home') }}" class="logo-text">BarcDog</a>
+        </div>
+        <div class="code-container">
             {% for code in codes %}
-            <div class="code-container">
-                <div class="code-type">{{ 'QR 코드' if code.type == 'qrcode' else '바코드' }}</div>
-                <div class="code-number">숫자: {{ code.number }}</div>
-                <img src="data:image/png;base64,{{ code.code | b64encode }}" alt="{{ code.type }} code" class="code-image">
+            <div class="code-item">
+                <h3>바코드</h3>
+                <p>숫자: {{ code.number }}</p>
+                <img src="data:image/png;base64,{{ code.code | b64encode }}" alt="{{ code.type }} code">
             </div>
             {% endfor %}
         </div>
-        <a href="{{ url_for('home') }}" class="back-button">다시 생성하기</a>
+        <div style="text-align: center;">
+            <a href="{{ url_for('home') }}" class="back-button">다시 생성하기</a>
+        </div>
     </div>
 </body>
 </html> 
