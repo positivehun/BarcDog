@@ -46,6 +46,7 @@ def generate():
             buffer.seek(0)
             return send_file(buffer, mimetype='image/png')
     except Exception as e:
+        print(f"Error: {str(e)}")  # 서버 로그에 에러 출력
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

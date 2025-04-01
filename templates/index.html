@@ -123,7 +123,7 @@
     </a>
     <div class="container">
         <h1>코드 생성기</h1>
-        <form method="POST" action="{{ url_for('generate') }}">
+        <form method="POST" action="{{ url_for('generate') }}" enctype="multipart/form-data">
             <div class="code-type-selector">
                 <label>
                     <input type="radio" name="code_type" value="barcode" checked> 바코드
