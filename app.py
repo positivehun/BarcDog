@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, send_file, url_for, jsonify, send_from_directory
-import barcode
-from barcode.writer import ImageWriter
+from pylibdmtx.pylibdmtx import encode
 from io import BytesIO
 import qrcode
 import os
 import re
 import base64
 import logging
+from PIL import Image
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
@@ -37,11 +37,17 @@ def create_barcode(number):
     try:
         logger.debug(f"Creating barcode for number: {number}")
         # 바코드 생성
-        code128 = barcode.get('code128', str(number))
+        encoded = encode(str(number).encode('utf8'))
         
-        # 이미지 생성
+        # PIL Image로 변환
+        img = Image.frombytes('RGB', (encoded.width, encoded.height), encoded.pixels)
+        
+        # 이미지 크기 조정
+        img = img.resize((300, 100), Image.Resampling.LANCZOS)
+        
+        # 버퍼에 저장
         buffer = BytesIO()
-        code128.save(buffer)
+        img.save(buffer, format='PNG')
         buffer.seek(0)
         
         # 버퍼 내용 확인
