@@ -29,21 +29,29 @@ def parse_numbers(input_string):
     return [num.strip() for num in numbers if num.strip()]
 
 def create_barcode(number):
-    code128 = barcode.get('code128', number, writer=ImageWriter())
-    buffer = BytesIO()
-    code128.write(buffer)
-    buffer.seek(0)
-    return buffer
+    try:
+        code128 = barcode.get('code128', number, writer=ImageWriter())
+        buffer = BytesIO()
+        code128.write(buffer)
+        buffer.seek(0)
+        return buffer
+    except Exception as e:
+        print(f"Barcode creation error: {str(e)}")
+        raise
 
 def create_qrcode(number):
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(number)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    buffer = BytesIO()
-    img.save(buffer, "PNG")
-    buffer.seek(0)
-    return buffer
+    try:
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(number)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, "PNG")
+        buffer.seek(0)
+        return buffer
+    except Exception as e:
+        print(f"QR code creation error: {str(e)}")
+        raise
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
@@ -64,16 +72,23 @@ def generate():
         # 각 숫자에 대한 코드 생성
         codes = []
         for number in parsed_numbers:
-            if code_type == 'barcode':
-                buffer = create_barcode(number)
-            else:  # qrcode
-                buffer = create_qrcode(number)
-            codes.append({
-                'number': number,
-                'code': buffer.getvalue(),
-                'type': code_type
-            })
+            try:
+                if code_type == 'barcode':
+                    buffer = create_barcode(number)
+                else:  # qrcode
+                    buffer = create_qrcode(number)
+                codes.append({
+                    'number': number,
+                    'code': buffer.getvalue(),
+                    'type': code_type
+                })
+            except Exception as e:
+                print(f"Error creating code for number {number}: {str(e)}")
+                continue
         
+        if not codes:
+            return jsonify({"error": "코드 생성 중 오류가 발생했습니다."}), 500
+            
         return render_template('result.html', codes=codes)
     except Exception as e:
         print(f"Error: {str(e)}")  # 서버 로그에 에러 출력
