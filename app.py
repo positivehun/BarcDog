@@ -4,7 +4,6 @@ from barcode.writer import ImageWriter
 from io import BytesIO
 import qrcode
 import os
-from http.server import BaseHTTPRequestHandler
 
 app = Flask(__name__)
 
@@ -41,22 +40,5 @@ def generate():
     except Exception as e:
         return str(e), 500
 
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        with app.request_context(request):
-            response = app.dispatch_request()
-            self.send_response(response.status_code)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            self.wfile.write(response.get_data())
-
-    def do_POST(self):
-        with app.request_context(request):
-            response = app.dispatch_request()
-            self.send_response(response.status_code)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            self.wfile.write(response.get_data())
-
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(host='0.0.0.0', port=5000) 
