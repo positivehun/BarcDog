@@ -42,7 +42,7 @@ def generate():
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
             buffer = BytesIO()
-            img.save(buffer, format='PNG')
+            img.save(buffer, "PNG")  # format 파라미터 제거
             buffer.seek(0)
             return send_file(buffer, mimetype='image/png')
     except Exception as e:
