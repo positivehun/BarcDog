@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file, url_for
+from flask import Flask, render_template, request, send_file, url_for, jsonify
 import barcode
 from barcode.writer import ImageWriter
 from io import BytesIO
@@ -11,14 +11,17 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-@app.route('/generate', methods=['POST'])
+@app.route('/generate', methods=['GET', 'POST'])
 def generate():
+    if request.method == 'GET':
+        return render_template('index.html')
+        
     try:
         data = request.form.get('data')
         code_type = request.form.get('code_type')
         
         if not data:
-            return "데이터를 입력해주세요.", 400
+            return jsonify({"error": "데이터를 입력해주세요."}), 400
         
         if code_type == 'barcode':
             # 바코드 생성
@@ -38,7 +41,7 @@ def generate():
             buffer.seek(0)
             return send_file(buffer, mimetype='image/png')
     except Exception as e:
-        return str(e), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
