@@ -6,6 +6,11 @@ import qrcode
 import os
 import re
 import base64
+import logging
+
+# 로깅 설정
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -30,21 +35,30 @@ def parse_numbers(input_string):
 
 def create_barcode(number):
     try:
+        logger.debug(f"Creating barcode for number: {number}")
         # 바코드 생성
-        code128 = barcode.get('code128', str(number), writer=ImageWriter())
+        code128 = barcode.get('code128', str(number))
         
         # 이미지 생성
         buffer = BytesIO()
-        code128.write(buffer)
+        code128.save(buffer)
         buffer.seek(0)
         
-        return buffer
+        # 버퍼 내용 확인
+        if buffer.getvalue():
+            logger.debug("Barcode created successfully")
+            return buffer
+        else:
+            logger.error("Empty buffer after barcode creation")
+            raise Exception("바코드 생성 실패: 빈 이미지")
+            
     except Exception as e:
-        print(f"Barcode creation error for {number}: {str(e)}")
+        logger.error(f"Barcode creation error for {number}: {str(e)}")
         raise
 
 def create_qrcode(number):
     try:
+        logger.debug(f"Creating QR code for number: {number}")
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(str(number))
         qr.make(fit=True)
@@ -52,9 +66,10 @@ def create_qrcode(number):
         buffer = BytesIO()
         img.save(buffer, "PNG")
         buffer.seek(0)
+        logger.debug("QR code created successfully")
         return buffer
     except Exception as e:
-        print(f"QR code creation error for {number}: {str(e)}")
+        logger.error(f"QR code creation error for {number}: {str(e)}")
         raise
 
 @app.route('/generate', methods=['GET', 'POST'])
@@ -66,12 +81,16 @@ def generate():
         data = request.form.get('data')
         code_type = request.form.get('code_type')
         
+        logger.debug(f"Received request - Data: {data}, Type: {code_type}")
+        
         if not data:
             return jsonify({"error": "데이터를 입력해주세요."}), 400
         
         parsed_numbers = parse_numbers(data)
         if len(parsed_numbers) == 0:
             return jsonify({"error": "유효한 숫자를 입력해주세요."}), 400
+        
+        logger.debug(f"Parsed numbers: {parsed_numbers}")
         
         # 각 숫자에 대한 코드 생성
         codes = []
@@ -82,14 +101,17 @@ def generate():
                 else:  # qrcode
                     buffer = create_qrcode(number)
                     
-                if buffer:
+                if buffer and buffer.getvalue():
                     codes.append({
                         'number': number,
                         'code': buffer.getvalue(),
                         'type': code_type
                     })
+                    logger.debug(f"Successfully created code for number: {number}")
+                else:
+                    logger.error(f"Failed to create code for number: {number}")
             except Exception as e:
-                print(f"Error creating code for number {number}: {str(e)}")
+                logger.error(f"Error creating code for number {number}: {str(e)}")
                 continue
         
         if not codes:
@@ -97,7 +119,7 @@ def generate():
             
         return render_template('result.html', codes=codes)
     except Exception as e:
-        print(f"Error: {str(e)}")  # 서버 로그에 에러 출력
+        logger.error(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
