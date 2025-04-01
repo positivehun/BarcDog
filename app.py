@@ -5,7 +5,6 @@ import os
 import re
 import base64
 import logging
-import math
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
@@ -49,76 +48,21 @@ def create_barcode(number):
         # 바코드 패턴 생성
         pattern = code128_pattern(str(number))
         
-        # 이미지 크기 설정
+        # SVG 생성
         width = len(pattern) * 2
         height = 100
         
-        # PNG 이미지 데이터 생성
-        def create_png_data(width, height, pattern):
-            # PNG 헤더
-            header = bytes([
-                0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,  # PNG 시그니처
-                0x00, 0x00, 0x00, 0x0D,  # IHDR 청크 길이
-                0x49, 0x48, 0x44, 0x52,  # "IHDR"
-                (width >> 24) & 0xFF, (width >> 16) & 0xFF, (width >> 8) & 0xFF, width & 0xFF,  # 너비
-                (height >> 24) & 0xFF, (height >> 16) & 0xFF, (height >> 8) & 0xFF, height & 0xFF,  # 높이
-                0x08,  # 비트 깊이
-                0x00,  # 컬러 타입 (그레이스케일)
-                0x00,  # 압축 방식
-                0x00,  # 필터 방식
-                0x00,  # 인터레이스 방식
-                0x00, 0x00, 0x00, 0x00,  # CRC
-            ])
-            
-            # 이미지 데이터 생성
-            image_data = bytearray()
-            for y in range(height):
-                # 필터 바이트
-                image_data.append(0)
-                # 스캔 라인
-                for x in range(width):
-                    if pattern[x // 2] == '1':
-                        image_data.append(0)  # 검은색
-                    else:
-                        image_data.append(255)  # 흰색
-            
-            # IDAT 청크
-            def adler32(data):
-                s1, s2 = 1, 0
-                for byte in data:
-                    s1 = (s1 + byte) % 65521
-                    s2 = (s2 + s1) % 65521
-                return (s2 << 16) | s1
-            
-            # zlib 압축 (간단한 구현)
-            compressed = image_data  # 실제로는 zlib 압축이 필요하지만, 테스트를 위해 생략
-            
-            idat_chunk = bytes([
-                (len(compressed) >> 24) & 0xFF, (len(compressed) >> 16) & 0xFF,
-                (len(compressed) >> 8) & 0xFF, len(compressed) & 0xFF,
-                0x49, 0x44, 0x41, 0x54,  # "IDAT"
-            ]) + compressed
-            
-            crc = adler32(idat_chunk[4:])
-            idat_chunk += bytes([
-                (crc >> 24) & 0xFF, (crc >> 16) & 0xFF,
-                (crc >> 8) & 0xFF, crc & 0xFF,
-            ])
-            
-            # IEND 청크
-            iend_chunk = bytes([
-                0x00, 0x00, 0x00, 0x00,  # 길이
-                0x49, 0x45, 0x4E, 0x44,  # "IEND"
-                0xAE, 0x42, 0x60, 0x82,  # CRC
-            ])
-            
-            return header + idat_chunk + iend_chunk
+        svg = f'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+        <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+        <svg width="{width}" height="{height}" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <rect width="{width}" height="{height}" fill="white"/>
+            <g fill="black">
+                {"".join(f'<rect x="{i*2}" y="0" width="2" height="{height}"/>' for i, bit in enumerate(pattern) if bit == '1')}
+            </g>
+        </svg>'''
         
-        # PNG 이미지 데이터 생성
-        png_data = create_png_data(width, height, pattern)
-        
-        # 버퍼에 저장
-        buffer = BytesIO(png_data)
+        # SVG를 바이트로 변환
+        buffer = BytesIO(svg.encode('utf-8'))
         buffer.seek(0)
         
         logger.debug("Barcode created successfully")
