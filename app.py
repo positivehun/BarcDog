@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file, url_for, jsonify
+from flask import Flask, render_template, request, send_file, url_for, jsonify, send_from_directory
 import barcode
 from barcode.writer import ImageWriter
 from io import BytesIO
@@ -6,6 +6,11 @@ import qrcode
 import os
 
 app = Flask(__name__)
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                             'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/')
 def home():

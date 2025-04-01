@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BarcDog - 코드 생성기</title>
+    <title>BarcDog - 바코드/QR코드 생성기</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -122,7 +123,7 @@
     </a>
     <div class="container">
         <h1>코드 생성기</h1>
-        <form method="POST">
+        <form method="POST" action="{{ url_for('generate') }}">
             <div class="code-type-selector">
                 <label>
                     <input type="radio" name="code_type" value="barcode" checked> 바코드
@@ -132,7 +133,7 @@
                 </label>
             </div>
             <div>
-                <textarea name="numbers" placeholder="코드로 변환할 숫자들을 입력하세요&#10;예시: 123, 456, 789&#10;또는: 123 456 789" required></textarea>
+                <textarea name="data" placeholder="코드로 변환할 숫자들을 입력하세요&#10;예시: 123, 456, 789&#10;또는: 123 456 789" required></textarea>
             </div>
             <div class="help-text">
                 여러 숫자를 쉼표(,) 또는 공백으로 구분하여 입력하세요.<br>
