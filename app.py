@@ -7,9 +7,6 @@ import os
 import re
 import base64
 import logging
-from reportlab.graphics import renderPM
-from reportlab.graphics.barcode import code128
-from reportlab.lib.pagesizes import letter
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
@@ -40,10 +37,11 @@ def create_barcode(number):
     try:
         logger.debug(f"Creating barcode for number: {number}")
         # 바코드 생성
+        code128 = barcode.get('code128', str(number))
+        
+        # 이미지 생성
         buffer = BytesIO()
-        barcode = code128.Code128(str(number))
-        drawing = barcode.getDrawing()
-        renderPM.drawToFile(drawing, buffer, fmt="PNG", dpi=300)
+        code128.save(buffer)
         buffer.seek(0)
         
         # 버퍼 내용 확인
