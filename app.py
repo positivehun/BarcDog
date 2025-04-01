@@ -6,7 +6,6 @@ import qrcode
 import os
 import re
 import base64
-from PIL import Image
 
 app = Flask(__name__)
 
@@ -39,15 +38,7 @@ def create_barcode(number):
         code128.write(buffer)
         buffer.seek(0)
         
-        # PIL Image로 변환
-        img = Image.open(buffer)
-        
-        # 새로운 버퍼 생성
-        new_buffer = BytesIO()
-        img.save(new_buffer, format='PNG')
-        new_buffer.seek(0)
-        
-        return new_buffer
+        return buffer
     except Exception as e:
         print(f"Barcode creation error for {number}: {str(e)}")
         raise
