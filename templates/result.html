@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarcDog - 코드 생성 결과</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #FBEFD4;
+            color: #333333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .logo-container {
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+        .logo-image {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+        .logo-text {
+            font-family: 'Gothic', 'Old English Text MT', 'UnifrakturMaguntia', serif;
+            font-size: 36px;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .code-container {
+            background-color: #f5f5f5;
+            padding: 25px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .code-number {
+            font-size: 18px;
+            color: #333333;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .code-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .code-type {
+            font-size: 14px;
+            color: #4CAF50;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .back-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .codes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="logo-container">
+        <img src="{{ url_for('static', filename='barcdog_logo.png') }}" alt="BarcDog Logo" class="logo-image">
+        <h2 class="logo-text">BarcDog</h2>
+    </a>
+    <div class="container">
+        <h1>코드 생성 결과</h1>
+        <div class="codes-grid">
+            {% for code in codes %}
+            <div class="code-container">
+                <div class="code-type">{{ 'QR 코드' if code.type == 'qrcode' else '바코드' }}</div>
+                <div class="code-number">숫자: {{ code.number }}</div>
+                <img class="code-image" src="data:image/png;base64,{{ code.code|b64encode }}" alt="{{ 'QR 코드' if code.type == 'qrcode' else '바코드' }}: {{ code.number }}">
+            </div>
+            {% endfor %}
+        </div>
+        <div style="text-align: center;">
+            <a href="/" class="back-button">새로운 코드 생성하기</a>
+        </div>
+    </div>
+</body>
+</html> 

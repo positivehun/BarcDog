@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarcDog - 코드 생성기</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #FBEFD4;
+            color: #333333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-container {
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+        .logo-image {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+        .logo-text {
+            font-family: 'Gothic', 'Old English Text MT', 'UnifrakturMaguntia', serif;
+            font-size: 36px;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 600px;
+        }
+        textarea {
+            width: 90%;
+            height: 100px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 16px;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            resize: vertical;
+            background-color: #ffffff;
+            color: #333333;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .help-text {
+            color: #b3b3b3;
+            font-size: 14px;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        .code-type-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .code-type-selector label {
+            margin: 0 20px;
+            cursor: pointer;
+            color: #333333;
+            font-size: 15px;
+        }
+        .code-type-selector input[type="radio"] {
+            margin-right: 8px;
+            accent-color: #4CAF50;
+        }
+        h1 {
+            color: #333333;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="logo-container">
+        <img src="{{ url_for('static', filename='barcdog_logo.png') }}" alt="BarcDog Logo" class="logo-image">
+        <h2 style="font-family: 'Malgun Gothic', 'Arial', sans-serif;" class="logo-text">BarcDog</h2>
+    </a>
+    <div class="container">
+        <h1>코드 생성기</h1>
+        <form method="POST">
+            <div class="code-type-selector">
+                <label>
+                    <input type="radio" name="code_type" value="barcode" checked> 바코드
+                </label>
+                <label>
+                    <input type="radio" name="code_type" value="qrcode"> QR 코드
+                </label>
+            </div>
+            <div>
+                <textarea name="numbers" placeholder="코드로 변환할 숫자들을 입력하세요&#10;예시: 123, 456, 789&#10;또는: 123 456 789" required></textarea>
+            </div>
+            <div class="help-text">
+                여러 숫자를 쉼표(,) 또는 공백으로 구분하여 입력하세요.<br>
+                예: 123,456,789 또는 123 456 789 또는 123, 456, 789
+            </div>
+            <button type="submit">코드 생성</button>
+        </form>
+    </div>
+</body>
+</html> 
