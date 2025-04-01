@@ -6,6 +6,7 @@ import qrcode
 import os
 import re
 import base64
+from PIL import Image
 
 app = Flask(__name__)
 
@@ -30,19 +31,31 @@ def parse_numbers(input_string):
 
 def create_barcode(number):
     try:
-        code128 = barcode.get('code128', number, writer=ImageWriter())
+        # 바코드 생성
+        code128 = barcode.get('code128', str(number), writer=ImageWriter())
+        
+        # 이미지 생성
         buffer = BytesIO()
         code128.write(buffer)
         buffer.seek(0)
-        return buffer
+        
+        # PIL Image로 변환
+        img = Image.open(buffer)
+        
+        # 새로운 버퍼 생성
+        new_buffer = BytesIO()
+        img.save(new_buffer, format='PNG')
+        new_buffer.seek(0)
+        
+        return new_buffer
     except Exception as e:
-        print(f"Barcode creation error: {str(e)}")
+        print(f"Barcode creation error for {number}: {str(e)}")
         raise
 
 def create_qrcode(number):
     try:
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(number)
+        qr.add_data(str(number))
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
         buffer = BytesIO()
@@ -50,7 +63,7 @@ def create_qrcode(number):
         buffer.seek(0)
         return buffer
     except Exception as e:
-        print(f"QR code creation error: {str(e)}")
+        print(f"QR code creation error for {number}: {str(e)}")
         raise
 
 @app.route('/generate', methods=['GET', 'POST'])
@@ -77,17 +90,19 @@ def generate():
                     buffer = create_barcode(number)
                 else:  # qrcode
                     buffer = create_qrcode(number)
-                codes.append({
-                    'number': number,
-                    'code': buffer.getvalue(),
-                    'type': code_type
-                })
+                    
+                if buffer:
+                    codes.append({
+                        'number': number,
+                        'code': buffer.getvalue(),
+                        'type': code_type
+                    })
             except Exception as e:
                 print(f"Error creating code for number {number}: {str(e)}")
                 continue
         
         if not codes:
-            return jsonify({"error": "코드 생성 중 오류가 발생했습니다."}), 500
+            return jsonify({"error": "코드 생성 중 오류가 발생했습니다. 입력된 데이터를 확인해주세요."}), 500
             
         return render_template('result.html', codes=codes)
     except Exception as e:
