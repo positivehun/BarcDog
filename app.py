@@ -42,8 +42,7 @@ def generate():
 
 # Vercel 서버리스 함수
 def handler(request):
-    with app.request_context(request):
-        return app.dispatch_request()
+    return app(request)
 
 if __name__ == '__main__':
     app.run(debug=True) 
