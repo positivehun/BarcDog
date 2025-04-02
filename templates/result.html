@@ -159,6 +159,34 @@
         .popup button:hover {
             background-color: #218838;
         }
+        .download-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .download-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        .download-button svg {
+            margin-right: 8px;
+            fill: white;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -175,7 +203,13 @@
             </div>
             {% endfor %}
         </div>
-        <div style="text-align: center;">
+        <div class="button-container">
+            <button onclick="downloadAllCodes()" class="download-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                모든 코드 다운로드
+            </button>
             <a href="{{ url_for('home') }}" class="back-button">다시 생성하기</a>
         </div>
     </div>
@@ -230,6 +264,47 @@
                 }
             }
         });
+
+        // 생성된 코드 데이터를 저장할 배열
+        const generatedCodes = [
+            {% for code in codes %}
+            {
+                type: '{{ code.type }}',
+                number: '{{ code.number }}',
+                code: '{{ code.code | b64encode }}'
+            },
+            {% endfor %}
+        ];
+
+        async function downloadAllCodes() {
+            try {
+                const response = await fetch('/download_codes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(generatedCodes)
+                });
+
+                if (!response.ok) throw new Error('다운로드 중 오류가 발생했습니다.');
+
+                // 응답을 blob으로 변환
+                const blob = await response.blob();
+                
+                // 다운로드 링크 생성 및 클릭
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `barcdog_codes_${new Date().toISOString().slice(0,19).replace(/[:-]/g, '')}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('다운로드 중 오류가 발생했습니다.');
+            }
+        }
     </script>
 </body>
 </html> 

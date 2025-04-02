@@ -8,6 +8,8 @@ import logging
 from barcode import Code128
 from barcode.writer import ImageWriter
 from PIL import Image, ImageDraw
+import zipfile
+from datetime import datetime
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
@@ -138,6 +140,33 @@ def generate():
     except Exception as e:
         logger.error(f"Error: {str(e)}")
         return render_template('error.html', error_message="처리 중 오류가 발생했습니다. 다시 시도해주세요.")
+
+@app.route('/download_codes', methods=['POST'])
+def download_codes():
+    try:
+        # ZIP 파일 생성
+        memory_file = BytesIO()
+        with zipfile.ZipFile(memory_file, 'w') as zf:
+            codes_data = request.get_json()
+            for idx, code in enumerate(codes_data, 1):
+                # Base64 디코딩
+                code_data = base64.b64decode(code['code'])
+                # 파일 이름 생성 (바코드/QR 코드 구분)
+                file_ext = 'png' if code['type'] == 'qrcode' else 'png'  # 둘 다 PNG로 저장
+                filename = f"{code['type']}_{code['number']}_{idx}.{file_ext}"
+                zf.writestr(filename, code_data)
+        
+        memory_file.seek(0)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        return send_file(
+            memory_file,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name=f'barcdog_codes_{timestamp}.zip'
+        )
+    except Exception as e:
+        logger.error(f"Error creating zip file: {str(e)}")
+        return jsonify({"error": "파일 생성 중 오류가 발생했습니다."}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
