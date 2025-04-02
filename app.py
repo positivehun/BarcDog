@@ -5,6 +5,8 @@ import os
 import re
 import base64
 import logging
+from barcode import Code128
+from barcode.writer import SVGWriter
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
@@ -48,16 +50,17 @@ def create_barcode(number):
         # 바코드 패턴 생성
         pattern = code128_pattern(str(number))
         
-        # SVG 생성
-        width = len(pattern) * 2
+        # SVG 생성 (바코드 두께 증가)
+        width = len(pattern) * 3  # 바코드 전체 너비 증가
         height = 100
+        bar_width = 3  # 개별 바 두께 증가 (기존 2에서 3으로)
         
         svg = f'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
         <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
         <svg width="{width}" height="{height}" version="1.1" xmlns="http://www.w3.org/2000/svg">
             <rect width="{width}" height="{height}" fill="white"/>
             <g fill="black">
-                {"".join(f'<rect x="{i*2}" y="0" width="2" height="{height}"/>' for i, bit in enumerate(pattern) if bit == '1')}
+                {"".join(f'<rect x="{i*bar_width}" y="0" width="{bar_width}" height="{height}"/>' for i, bit in enumerate(pattern) if bit == '1')}
             </g>
         </svg>'''
         
