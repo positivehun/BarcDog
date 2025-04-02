@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarcDog - 오류</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #F5F6F2;
+            color: #333333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #F5F6F2;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            text-align: center;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            display: block;
+            width: 100%;
+        }
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+        .logo-image {
+            width: 240px;
+            height: 240px;
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        .error-message {
+            font-size: 1.2em;
+            color: #dc3545;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 8px;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+            font-size: 1.1em;
+        }
+        .back-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='barcdog_logo2.png') }}" alt="BarcDog Logo" class="logo-image">
+        </a>
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        <div>
+            <a href="{{ url_for('home') }}" class="back-button">다시 시도하기</a>
+        </div>
+    </div>
+</body>
+</html> 

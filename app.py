@@ -89,15 +89,18 @@ def generate():
         logger.debug(f"Received request - Data: {data}, Type: {code_type}")
         
         if not data:
-            return jsonify({"error": "데이터를 입력해주세요."}), 400
+            return render_template('error.html', error_message="데이터를 입력해주세요.")
+        
+        # 유효한 문자 검사 (숫자, 영문자, 특수문자 _, -, 공백만 허용)
+        if not re.match(r'^[0-9A-Za-z_\- ]+$', data):
+            return render_template('error.html', error_message="올바르지 않은 데이터입니다. 숫자, 영문자, 특수문자(_, -) 만 입력 가능합니다.")
         
         parsed_numbers = parse_numbers(data)
         if len(parsed_numbers) == 0:
-            return jsonify({"error": "유효한 숫자를 입력해주세요."}), 400
+            return render_template('error.html', error_message="유효한 데이터를 입력해주세요.")
         
         logger.debug(f"Parsed numbers: {parsed_numbers}")
         
-        # 각 숫자에 대한 코드 생성
         codes = []
         for number in parsed_numbers:
             try:
@@ -115,17 +118,18 @@ def generate():
                     logger.debug(f"Successfully created code for number: {number}")
                 else:
                     logger.error(f"Failed to create code for number: {number}")
+                    return render_template('error.html', error_message="코드 생성에 실패했습니다.")
             except Exception as e:
                 logger.error(f"Error creating code for number {number}: {str(e)}")
-                continue
+                return render_template('error.html', error_message="코드 생성 중 오류가 발생했습니다.")
         
         if not codes:
-            return jsonify({"error": "코드 생성 중 오류가 발생했습니다. 입력된 데이터를 확인해주세요."}), 500
+            return render_template('error.html', error_message="코드 생성에 실패했습니다. 입력된 데이터를 확인해주세요.")
             
         return render_template('result.html', codes=codes)
     except Exception as e:
         logger.error(f"Error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return render_template('error.html', error_message="처리 중 오류가 발생했습니다. 다시 시도해주세요.")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
