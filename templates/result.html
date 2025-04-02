@@ -82,13 +82,7 @@
             <div class="code-item">
                 <h3>바코드</h3>
                 <p>숫자: {{ code.number }}</p>
-                {% if code.type == 'barcode' %}
-                <div class="svg-container">
-                    {{ code.code.decode('utf-8') | safe }}
-                </div>
-                {% else %}
-                <img src="data:image/png;base64,{{ code.code | b64encode }}" alt="QR code">
-                {% endif %}
+                <img src="data:image/png;base64,{{ code.code | b64encode }}" alt="{% if code.type == 'barcode' %}Barcode{% else %}QR code{% endif %}">
             </div>
             {% endfor %}
         </div>
