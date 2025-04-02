@@ -6,7 +6,7 @@ import re
 import base64
 import logging
 from barcode import Code128
-from barcode.writer import SVGWriter
+from barcode.writer import ImageWriter
 from PIL import Image, ImageDraw
 
 # 로깅 설정
@@ -38,85 +38,24 @@ def create_barcode(data):
     try:
         logger.debug(f"Creating barcode for data: {data}")
         
-        def code128_pattern(data):
-            # Code 128B 패턴 (ASCII 32-127)
-            patterns = {
-                # 숫자
-                '0': '11011001100', '1': '11001101100', '2': '11001100110',
-                '3': '10010011000', '4': '10010001100', '5': '10000101100',
-                '6': '10000100110', '7': '11001001000', '8': '11001000100',
-                '9': '10100011000',
-                # 알파벳 대문자
-                'A': '10100001100', 'B': '10010001100', 'C': '10001001100',
-                'D': '10100011000', 'E': '10010011000', 'F': '10001011000',
-                'G': '10000101100', 'H': '10000100110', 'I': '10110001000',
-                'J': '10110000100', 'K': '10011010000', 'L': '10011000100',
-                'M': '10000110100', 'N': '10000110010', 'O': '11000010010',
-                'P': '11001010000', 'Q': '11110111010', 'R': '11000010100',
-                'S': '10110111000', 'T': '10110001110', 'U': '10001101110',
-                'V': '10111011000', 'W': '10111000110', 'X': '10001110110',
-                'Y': '11101110110', 'Z': '11010001110',
-                # 특수문자
-                '_': '10010100000', '-': '10101000000',
-            }
-            
-            # 시작 코드 B (ASCII)
-            result = '11010010000'
-            
-            # 데이터 인코딩
-            for char in str(data):
-                if char in patterns:
-                    result += patterns[char]
-                else:
-                    # 지원하지 않는 문자는 공백으로 대체
-                    result += patterns['0']
-            
-            # 체크섬 계산
-            checksum = 104  # 시작 문자 B의 값
-            for i, char in enumerate(str(data)):
-                if char in patterns:
-                    checksum += (i + 1) * (ord(char) - 32)
-            checksum = checksum % 103
-            
-            # 체크섬 패턴 추가
-            checksum_pattern = patterns.get(str(checksum % 10), patterns['0'])
-            result += checksum_pattern
-            
-            # 정지 패턴
-            result += '1100011101011'
-            
-            return result
+        # Code128 바코드 생성 (Auto 모드)
+        rv = BytesIO()
+        # Code128 Auto 모드로 생성 (문자, 숫자 자동 최적화)
+        Code128(str(data), writer=ImageWriter()).write(rv, {
+            'module_width': 0.4,     # 바코드 선 두께
+            'module_height': 15.0,   # 바코드 높이
+            'quiet_zone': 6.0,       # 여백
+            'font_size': 10,         # 텍스트 크기
+            'text_distance': 5.0,    # 텍스트와 바코드 사이 거리
+            'background': 'white',   # 배경색
+            'foreground': 'black',   # 바코드 색
+            'write_text': True,      # 바코드 아래 텍스트 표시
+            'dpi': 300,             # 해상도
+        })
         
-        # 바코드 패턴 생성
-        pattern = code128_pattern(str(data))
-        
-        # 이미지 크기 설정
-        bar_width = 4  # 바코드 선 두께
-        height = 150   # 바코드 높이 증가
-        margin = 50    # 여백 증가
-        
-        # 전체 이미지 크기 계산
-        width = len(pattern) * bar_width
-        total_width = width + (margin * 2)
-        total_height = height + (margin * 2)
-        
-        # 흰색 배경의 이미지 생성
-        image = Image.new('RGB', (total_width, total_height), 'white')
-        draw = ImageDraw.Draw(image)
-        
-        # 바코드 그리기
-        for i, bit in enumerate(pattern):
-            if bit == '1':
-                x = (i * bar_width) + margin
-                draw.rectangle([x, margin, x + bar_width - 1, height + margin], fill='black')
-        
-        # 이미지를 바이트로 변환
-        buffer = BytesIO()
-        image.save(buffer, format='PNG', dpi=(300, 300))  # DPI 증가
-        buffer.seek(0)
-        
+        rv.seek(0)
         logger.debug("Barcode created successfully")
-        return buffer
+        return rv
             
     except Exception as e:
         logger.error(f"Barcode creation error for {data}: {str(e)}")
