@@ -60,23 +60,27 @@
         .back-button:hover {
             background-color: #218838;
         }
-        .title {
+        .logo-container {
             text-align: center;
             margin-bottom: 30px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
         }
-        .logo-text {
-            font-family: 'Gothic', 'Old English Text MT', 'UnifrakturMaguntia', serif;
-            font-size: 2em;
-            color: #28a745;
-            text-decoration: none;
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+        .logo-image {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="title">
-            <a href="{{ url_for('home') }}" class="logo-text">BarcDog</a>
-        </div>
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='barcdog_logo2.png') }}" alt="BarcDog Logo" class="logo-image">
+        </a>
         <div class="code-container">
             {% for code in codes %}
             <div class="code-item">
