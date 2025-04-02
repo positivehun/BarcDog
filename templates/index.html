@@ -150,14 +150,14 @@
             const isBarcode = document.querySelector('input[name="code_type"]:checked').value === 'barcode';
             
             if (isBarcode) {
-                dataInput.placeholder = "여러 개의 바코드를 생성하려면 숫자를 쉼표(,)나 공백으로 구분해서 입력하세요.\n예시: 123, 456, 789\n또는: 123 456 789";
+                dataInput.placeholder = "여러 개의 바코드를 생성하려면 숫자를 쉼표(,)나 공백으로 구분해서 입력하세요.\n예시: 123_ABC, 456_DEF\n또는: 123_ABC 456_DEF";
                 helpText.innerHTML = `
                     <strong>바코드 입력 가이드</strong><br>
                     • 숫자, 영문자, 특수문자(_, -) 입력 가능<br>
                     • 여러 개의 바코드를 한 번에 생성하려면 쉼표(,) 또는 공백으로 구분<br>
-                    • 예시 1: 123, 456, 789<br>
-                    • 예시 2: 123 456 789<br>
-                    • 예시 3: ABC123, DEF456
+                    • 예시 1: 123_ABC, 456_DEF<br>
+                    • 예시 2: ABC_123 DEF_456<br>
+                    • 예시 3: 11240724009RC_HS00998
                 `;
             } else {
                 dataInput.placeholder = "QR 코드로 변환할 텍스트나 URL을 입력하세요.\n예시: https://example.com";

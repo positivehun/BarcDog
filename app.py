@@ -93,16 +93,12 @@ def generate():
         
         # QR 코드와 바코드의 유효성 검사를 분리
         if code_type == 'barcode':
-            # 바코드는 숫자, 영문자, 특수문자(_, -) 만 허용
+            # 바코드는 숫자, 영문자, 특수문자(_, -) 허용
             if not re.match(r'^[0-9A-Za-z_\- ]+$', data):
                 return render_template('error.html', error_message="올바르지 않은 데이터입니다. 바코드는 숫자, 영문자, 특수문자(_, -) 만 입력 가능합니다.")
-        else:  # QR 코드
-            # QR 코드는 모든 문자 허용 (URL 포함)
-            pass  # URL을 포함한 모든 문자열 허용
         
         # 쉼표나 공백으로 구분된 여러 데이터 처리
-        parsed_data = re.split(r'[,\s]+', data.strip())
-        parsed_data = [item.strip() for item in parsed_data if item.strip()]
+        parsed_data = [item.strip() for item in re.split(r'[,\s]+', data.strip()) if item.strip()]
         
         if len(parsed_data) == 0:
             return render_template('error.html', error_message="유효한 데이터를 입력해주세요.")
@@ -119,7 +115,7 @@ def generate():
                     
                 if buffer and buffer.getvalue():
                     codes.append({
-                        'number': item,  # 'number' 대신 'item'으로 표시하면 더 적절할 수 있습니다
+                        'number': item,
                         'code': buffer.getvalue(),
                         'type': code_type
                     })
