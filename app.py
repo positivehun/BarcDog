@@ -91,36 +91,44 @@ def generate():
         if not data:
             return render_template('error.html', error_message="데이터를 입력해주세요.")
         
-        # 유효한 문자 검사 (숫자, 영문자, 특수문자 _, -, 공백만 허용)
-        if not re.match(r'^[0-9A-Za-z_\- ]+$', data):
-            return render_template('error.html', error_message="올바르지 않은 데이터입니다. 숫자, 영문자, 특수문자(_, -) 만 입력 가능합니다.")
+        # QR 코드와 바코드의 유효성 검사를 분리
+        if code_type == 'barcode':
+            # 바코드는 숫자, 영문자, 특수문자(_, -) 만 허용
+            if not re.match(r'^[0-9A-Za-z_\- ]+$', data):
+                return render_template('error.html', error_message="올바르지 않은 데이터입니다. 바코드는 숫자, 영문자, 특수문자(_, -) 만 입력 가능합니다.")
+        else:  # QR 코드
+            # QR 코드는 모든 문자 허용 (URL 포함)
+            pass  # URL을 포함한 모든 문자열 허용
         
-        parsed_numbers = parse_numbers(data)
-        if len(parsed_numbers) == 0:
+        # 쉼표나 공백으로 구분된 여러 데이터 처리
+        parsed_data = re.split(r'[,\s]+', data.strip())
+        parsed_data = [item.strip() for item in parsed_data if item.strip()]
+        
+        if len(parsed_data) == 0:
             return render_template('error.html', error_message="유효한 데이터를 입력해주세요.")
         
-        logger.debug(f"Parsed numbers: {parsed_numbers}")
+        logger.debug(f"Parsed data: {parsed_data}")
         
         codes = []
-        for number in parsed_numbers:
+        for item in parsed_data:
             try:
                 if code_type == 'barcode':
-                    buffer = create_barcode(number)
+                    buffer = create_barcode(item)
                 else:  # qrcode
-                    buffer = create_qrcode(number)
+                    buffer = create_qrcode(item)
                     
                 if buffer and buffer.getvalue():
                     codes.append({
-                        'number': number,
+                        'number': item,  # 'number' 대신 'item'으로 표시하면 더 적절할 수 있습니다
                         'code': buffer.getvalue(),
                         'type': code_type
                     })
-                    logger.debug(f"Successfully created code for number: {number}")
+                    logger.debug(f"Successfully created code for data: {item}")
                 else:
-                    logger.error(f"Failed to create code for number: {number}")
+                    logger.error(f"Failed to create code for data: {item}")
                     return render_template('error.html', error_message="코드 생성에 실패했습니다.")
             except Exception as e:
-                logger.error(f"Error creating code for number {number}: {str(e)}")
+                logger.error(f"Error creating code for data {item}: {str(e)}")
                 return render_template('error.html', error_message="코드 생성 중 오류가 발생했습니다.")
         
         if not codes:

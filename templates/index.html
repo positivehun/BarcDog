@@ -136,11 +136,16 @@
                 </label>
             </div>
             <div>
-                <textarea name="data" placeholder="코드로 변환할 숫자들을 입력하세요&#10;예시: 123, 456, 789&#10;또는: 123 456 789" required></textarea>
+                <textarea name="data" placeholder="{% if code_type == 'barcode' %}코드로 변환할 숫자들을 입력하세요&#10;예시: 123, 456, 789&#10;또는: 123 456 789{% else %}QR 코드로 변환할 텍스트나 URL을 입력하세요&#10;예시: https://example.com&#10;또는: 안녕하세요{% endif %}" required></textarea>
             </div>
             <div class="help-text">
+                {% if code_type == 'barcode' %}
                 여러 숫자를 쉼표(,) 또는 공백으로 구분하여 입력하세요.<br>
                 예: 123,456,789 또는 123 456 789 또는 123, 456, 789
+                {% else %}
+                URL이나 텍스트를 입력하세요.<br>
+                예: https://barcdog.vercel.app/ 또는 안녕하세요
+                {% endif %}
             </div>
             <button type="submit">코드 생성</button>
         </form>
