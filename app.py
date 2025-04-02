@@ -7,6 +7,7 @@ import base64
 import logging
 from barcode import Code128
 from barcode.writer import SVGWriter
+from PIL import Image, ImageDraw
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
@@ -36,9 +37,8 @@ def parse_numbers(input_string):
 def create_barcode(number):
     try:
         logger.debug(f"Creating barcode for number: {number}")
-        # Code 128 바코드 패턴 생성
+        
         def code128_pattern(data):
-            # Code 128B 패턴 (숫자만)
             patterns = {
                 '0': '11011001100', '1': '11001101100', '2': '11001100110',
                 '3': '10010011000', '4': '10010001100', '5': '10000101100',
@@ -50,22 +50,24 @@ def create_barcode(number):
         # 바코드 패턴 생성
         pattern = code128_pattern(str(number))
         
-        # SVG 생성 (바코드 두께 증가)
-        width = len(pattern) * 3  # 바코드 전체 너비 증가
+        # 이미지 크기 설정
+        bar_width = 3  # 바코드 선 두께
+        width = len(pattern) * bar_width
         height = 100
-        bar_width = 3  # 개별 바 두께 증가 (기존 2에서 3으로)
         
-        svg = f'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-        <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-        <svg width="{width}" height="{height}" version="1.1" xmlns="http://www.w3.org/2000/svg">
-            <rect width="{width}" height="{height}" fill="white"/>
-            <g fill="black">
-                {"".join(f'<rect x="{i*bar_width}" y="0" width="{bar_width}" height="{height}"/>' for i, bit in enumerate(pattern) if bit == '1')}
-            </g>
-        </svg>'''
+        # 흰색 배경의 이미지 생성
+        image = Image.new('RGB', (width + 40, height + 40), 'white')  # 여백 추가
+        draw = ImageDraw.Draw(image)
         
-        # SVG를 바이트로 변환
-        buffer = BytesIO(svg.encode('utf-8'))
+        # 바코드 그리기
+        for i, bit in enumerate(pattern):
+            if bit == '1':
+                x = i * bar_width + 20  # 여백 20px
+                draw.rectangle([x, 20, x + bar_width - 1, height + 20], fill='black')
+        
+        # 이미지를 바이트로 변환
+        buffer = BytesIO()
+        image.save(buffer, format='PNG')
         buffer.seek(0)
         
         logger.debug("Barcode created successfully")
