@@ -93,7 +93,7 @@
             {% for code in codes %}
             <div class="code-item">
                 <h3>{% if code.type == 'barcode' %}바코드{% else %}QR 코드{% endif %}</h3>
-                <p>숫자: {{ code.number }}</p>
+                <p>{% if code.type == 'barcode' %}데이터{% else %}텍스트/URL{% endif %}: {{ code.number }}</p>
                 <img src="data:image/png;base64,{{ code.code | b64encode }}" alt="{% if code.type == 'barcode' %}Barcode{% else %}QR code{% endif %}">
             </div>
             {% endfor %}

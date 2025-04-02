@@ -150,22 +150,34 @@
             const isBarcode = document.querySelector('input[name="code_type"]:checked').value === 'barcode';
             
             if (isBarcode) {
-                dataInput.placeholder = "여러 개의 바코드를 생성하려면 숫자를 쉼표(,)나 공백으로 구분해서 입력하세요.\n예시: 123_ABC, 456_DEF\n또는: 123_ABC 456_DEF";
+                dataInput.placeholder = "여러 개의 바코드를 생성하려면 쉼표(,), 공백 또는 줄바꿈으로 구분해서 입력하세요.\n예시:\n212409090162020_HS11236RSE0140020\n212409090162020_HS11236RSE0140020";
                 helpText.innerHTML = `
                     <strong>바코드 입력 가이드</strong><br>
                     • 숫자, 영문자, 특수문자(_, -) 입력 가능<br>
-                    • 여러 개의 바코드를 한 번에 생성하려면 쉼표(,) 또는 공백으로 구분<br>
-                    • 예시 1: 123_ABC, 456_DEF<br>
-                    • 예시 2: ABC_123 DEF_456<br>
-                    • 예시 3: 11240724009RC_HS00998
+                    • 여러 개의 바코드를 한 번에 생성하려면 다음 중 선택:<br>
+                    &nbsp;&nbsp;- 줄바꿈으로 구분<br>
+                    &nbsp;&nbsp;- 쉼표(,)로 구분<br>
+                    &nbsp;&nbsp;- 공백으로 구분<br>
+                    • 예시 1 (줄바꿈):<br>
+                    &nbsp;&nbsp;212409090162020_HS11236RSE0140020<br>
+                    &nbsp;&nbsp;212409090162020_HS11236RSE0140020<br>
+                    • 예시 2 (쉼표): 123_ABC, 456_DEF<br>
+                    • 예시 3 (공백): ABC_123 DEF_456
                 `;
             } else {
-                dataInput.placeholder = "QR 코드로 변환할 텍스트나 URL을 입력하세요.\n예시: https://example.com";
+                dataInput.placeholder = "여러 개의 QR 코드를 생성하려면 쉼표(,), 공백 또는 줄바꿈으로 구분해서 입력하세요.\n예시:\nhttps://example.com\nhttps://barcdog.vercel.app/";
                 helpText.innerHTML = `
                     <strong>QR 코드 입력 가이드</strong><br>
                     • 웹사이트 주소, 일반 텍스트 모두 입력 가능<br>
-                    • 예시 1: https://barcdog.vercel.app/<br>
-                    • 예시 2: 안녕하세요
+                    • 여러 개의 QR 코드를 한 번에 생성하려면 다음 중 선택:<br>
+                    &nbsp;&nbsp;- 줄바꿈으로 구분<br>
+                    &nbsp;&nbsp;- 쉼표(,)로 구분<br>
+                    &nbsp;&nbsp;- 공백으로 구분<br>
+                    • 예시 1 (줄바꿈):<br>
+                    &nbsp;&nbsp;https://barcdog.vercel.app/<br>
+                    &nbsp;&nbsp;https://example.com<br>
+                    • 예시 2 (쉼표): hello, world<br>
+                    • 예시 3 (공백): hello world
                 `;
             }
         }
