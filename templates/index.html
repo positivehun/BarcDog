@@ -129,26 +129,49 @@
         <form method="POST" action="{{ url_for('generate') }}" enctype="multipart/form-data">
             <div class="code-type-selector">
                 <label>
-                    <input type="radio" name="code_type" value="barcode" checked> 바코드
+                    <input type="radio" name="code_type" value="barcode" checked onclick="updatePlaceholder()"> 바코드
                 </label>
                 <label>
-                    <input type="radio" name="code_type" value="qrcode"> QR 코드
+                    <input type="radio" name="code_type" value="qrcode" onclick="updatePlaceholder()"> QR 코드
                 </label>
             </div>
             <div>
-                <textarea name="data" placeholder="{% if code_type == 'barcode' %}코드로 변환할 숫자들을 입력하세요&#10;예시: 123, 456, 789&#10;또는: 123 456 789{% else %}QR 코드로 변환할 텍스트나 URL을 입력하세요&#10;예시: https://example.com&#10;또는: 안녕하세요{% endif %}" required></textarea>
+                <textarea id="dataInput" name="data" required></textarea>
             </div>
-            <div class="help-text">
-                {% if code_type == 'barcode' %}
-                여러 숫자를 쉼표(,) 또는 공백으로 구분하여 입력하세요.<br>
-                예: 123,456,789 또는 123 456 789 또는 123, 456, 789
-                {% else %}
-                URL이나 텍스트를 입력하세요.<br>
-                예: https://barcdog.vercel.app/ 또는 안녕하세요
-                {% endif %}
-            </div>
+            <div id="helpText" class="help-text"></div>
             <button type="submit">코드 생성</button>
         </form>
     </div>
+
+    <script>
+        function updatePlaceholder() {
+            const dataInput = document.getElementById('dataInput');
+            const helpText = document.getElementById('helpText');
+            const isBarcode = document.querySelector('input[name="code_type"]:checked').value === 'barcode';
+            
+            if (isBarcode) {
+                dataInput.placeholder = "여러 개의 바코드를 생성하려면 숫자를 쉼표(,)나 공백으로 구분해서 입력하세요.\n예시: 123, 456, 789\n또는: 123 456 789";
+                helpText.innerHTML = `
+                    <strong>바코드 입력 가이드</strong><br>
+                    • 숫자, 영문자, 특수문자(_, -) 입력 가능<br>
+                    • 여러 개의 바코드를 한 번에 생성하려면 쉼표(,) 또는 공백으로 구분<br>
+                    • 예시 1: 123, 456, 789<br>
+                    • 예시 2: 123 456 789<br>
+                    • 예시 3: ABC123, DEF456
+                `;
+            } else {
+                dataInput.placeholder = "QR 코드로 변환할 텍스트나 URL을 입력하세요.\n예시: https://example.com";
+                helpText.innerHTML = `
+                    <strong>QR 코드 입력 가이드</strong><br>
+                    • 웹사이트 주소, 일반 텍스트 모두 입력 가능<br>
+                    • 예시 1: https://barcdog.vercel.app/<br>
+                    • 예시 2: 안녕하세요
+                `;
+            }
+        }
+
+        // 페이지 로드 시 초기 실행
+        window.onload = updatePlaceholder;
+    </script>
 </body>
 </html> 
